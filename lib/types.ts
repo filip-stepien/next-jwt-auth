@@ -1,27 +1,44 @@
+export interface RouteRequestParams {
+    params: { auth?: string[] } | undefined;
+}
+
+export interface TokenOptions {
+    secret: string;
+    expiresIn: string;
+    issuer: string;
+    audience: string;
+}
+
 export interface AuthOptions {
-    /** Secrets used for generating tokens.
+    accessToken: TokenOptions;
+    refreshToken: TokenOptions;
+
+    /** Name attribute values for input fields used in the login form.
      */
-    secrets: {
-        accessToken: string;
-        refreshToken: string;
+    inputNames: {
+        username: string;
+        password: string;
+    };
+
+    cookie: {
+        tokenCookieName: string;
     };
 
     callbacks: {
-        /** Callback emitted upon access token generation.
+        /** Callback emitted before access token generation.
          * Returned payload will be stored in the generated token.
          */
-        accessToken: () => object | Promise<object>;
+        accessTokenPayload: () => object | Promise<object>;
 
-        /** Callback emitted upon refresh token generation.
+        /** Callback emitted before refresh token generation.
          * Returned payload will be stored in the generated token.
          */
-        refreshToken: () => object | Promise<object>;
+        refreshTokenPayload: () => object | Promise<object>;
 
-        /** Callback emitted on the login action.
-         * This function should store refresh token from parameter in a secure location,
-         * preferably in an encrypted form.
+        /** Callback used for authenticating a user.
+         * This function should check if passed credentials are valid.
          */
-        login: (refreshToken: string) => void | Promise<void>;
+        login: (username: string, password: string) => boolean | Promise<boolean>;
 
         /** Callback emitted when the user navigates between pages.
          * This function should be used to check if the refresh token
