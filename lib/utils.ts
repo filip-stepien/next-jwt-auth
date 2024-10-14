@@ -1,5 +1,6 @@
 import { JWTPayload, SignJWT } from 'jose';
 import { TokenOptions } from './types';
+import * as jose from 'jose';
 
 export async function generateToken(payload: object, opt: TokenOptions): Promise<string | null> {
     try {
@@ -12,7 +13,16 @@ export async function generateToken(payload: object, opt: TokenOptions): Promise
             .setExpirationTime(opt.expiresIn)
             .sign(new TextEncoder().encode(opt.secret));
         return token;
-    } catch (e) {
+    } catch (_e) {
+        return null;
+    }
+}
+
+export async function refreshToken(oldToken: string, opt: TokenOptions): Promise<string | null> {
+    try {
+        const payload = jose.decodeJwt(oldToken);
+        return await generateToken(payload, opt);
+    } catch (_e) {
         return null;
     }
 }

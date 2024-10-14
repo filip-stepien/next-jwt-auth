@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AuthOptions, RouteRequestParams } from './types';
 import loginRoute from '@/lib/routes/login';
+import refreshTokenRoute from '@/lib/routes/refreshToken';
 
 async function routeHandler(req: NextRequest, { params }: RouteRequestParams, opt: AuthOptions) {
     if (params && params.auth) {
@@ -9,6 +10,8 @@ async function routeHandler(req: NextRequest, { params }: RouteRequestParams, op
         switch (route) {
             case 'login':
                 return loginRoute(req, opt);
+            case 'refresh-token':
+                return refreshTokenRoute(req, opt);
         }
 
         return NextResponse.json({ hello: 'hello' });

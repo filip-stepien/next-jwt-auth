@@ -40,11 +40,11 @@ export interface AuthOptions {
          */
         login: (username: string, password: string) => boolean | Promise<boolean>;
 
-        /** Callback emitted when the user navigates between pages.
+        /** Callback emitted when the user navigates between pages or refreshes the access token.
          * This function should be used to check if the refresh token
          * from the cookie is valid and matches the previously stored token.
          */
-        checkAuth: (refreshToken: string) => boolean | Promise<boolean>;
+        tokenValid: (refreshToken: string) => boolean | Promise<boolean>;
 
         /** Callback emitted before discarding the refresh token from the cookie.
          * This function should be used to delete the previously stored token.
