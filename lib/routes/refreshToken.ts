@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { AuthOptions } from '@/lib/types';
+import { NextResponse } from 'next/server';
+import { AuthRouteHandler } from '@/lib/types';
 import { getBodyJSON, refreshToken } from '@/lib//utils';
 
-export default async function refreshTokenRoute(req: NextRequest, opt: AuthOptions) {
+const refreshTokenRoute: AuthRouteHandler = async (req, opt) => {
     try {
         const body = (await getBodyJSON(req)) as { token: string };
         if (!body) return new NextResponse(null, { status: 400 });
@@ -22,4 +22,6 @@ export default async function refreshTokenRoute(req: NextRequest, opt: AuthOptio
     } catch (_e) {
         return new NextResponse(null, { status: 500 });
     }
-}
+};
+
+export default refreshTokenRoute;

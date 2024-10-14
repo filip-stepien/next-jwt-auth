@@ -55,8 +55,13 @@ export interface AuthOptions {
     };
 }
 
+export type AuthRouteHandler = (
+    req: NextRequest,
+    options: AuthOptions
+) => NextResponse | Promise<NextResponse>;
+
 export interface AuthRoute {
     method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTIONS';
     route: string;
-    handler: (req: NextRequest, options: AuthOptions) => NextResponse | Promise<NextResponse>;
+    handler: AuthRouteHandler;
 }

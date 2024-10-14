@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { AuthOptions } from '@/lib/types';
+import { NextResponse } from 'next/server';
+import { AuthRouteHandler } from '@/lib/types';
 import { generateToken, getBodyFormData } from '@/lib/utils';
 
-export default async function loginRoute(req: NextRequest, opt: AuthOptions) {
+const loginRoute: AuthRouteHandler = async (req, opt) => {
     try {
         const formData = (await getBodyFormData(req)) as { username: string; password: string };
         const { username, password } = formData;
@@ -25,4 +25,6 @@ export default async function loginRoute(req: NextRequest, opt: AuthOptions) {
     } catch (_e) {
         return new NextResponse(null, { status: 500 });
     }
-}
+};
+
+export default loginRoute;
