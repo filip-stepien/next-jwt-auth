@@ -6,18 +6,33 @@ import { AuthOptions } from '@/lib/types';
 let storage: string[] = [];
 
 const options: AuthOptions = {
-    secrets: {
-        accessToken: '👻👻👻',
-        refreshToken: '😨😨😨'
+    accessToken: {
+        secret: '👻👻👻',
+        expiresIn: '5m',
+        issuer: 'issuer',
+        audience: 'audience'
+    },
+    refreshToken: {
+        secret: '👻👻👻',
+        expiresIn: '5m',
+        issuer: 'issuer',
+        audience: 'audience'
+    },
+    inputNames: {
+        username: 'username',
+        password: 'password'
+    },
+    cookie: {
+        tokenCookieName: 'refresh-token'
     },
     callbacks: {
-        accessToken: () => ({ username: 'admin' }),
-        refreshToken: async () => ({ username: 'admin' }),
-        login: (refreshToken: string) => {
-            storage.push(refreshToken);
+        accessTokenPayload: () => ({ username: 'admin' }),
+        refreshTokenPayload: async () => ({ username: 'admin' }),
+        login: (_username: string, _password: string) => {
+            return true;
         },
-        checkAuth: (refreshToken: string) => {
-            return storage.some(token => token === refreshToken);
+        tokenValid: (_refreshToken: string) => {
+            return true;
         },
         logout: (refreshToken: string) => {
             storage = storage.filter(token => token !== refreshToken);

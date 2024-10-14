@@ -1,3 +1,5 @@
+import { NextRequest, NextResponse } from 'next/server';
+
 export interface RouteRequestParams {
     params: { auth?: string[] } | undefined;
 }
@@ -51,4 +53,10 @@ export interface AuthOptions {
          */
         logout: (refreshToken: string) => void | Promise<void>;
     };
+}
+
+export interface AuthRoute {
+    method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTIONS';
+    route: string;
+    handler: (req: NextRequest, options: AuthOptions) => NextResponse | Promise<NextResponse>;
 }

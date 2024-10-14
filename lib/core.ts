@@ -1,25 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AuthOptions, RouteRequestParams } from './types';
+import { AuthOptions, AuthRoute, RouteRequestParams } from './types';
 import loginRoute from '@/lib/routes/login';
 import refreshTokenRoute from '@/lib/routes/refreshToken';
 
-async function routeHandler(req: NextRequest, { params }: RouteRequestParams, opt: AuthOptions) {
+const router: AuthRoute[] = [
+    { route: 'login', method: 'POST', handler: loginRoute },
+    { route: 'refreshToken', method: 'POST', handler: refreshTokenRoute }
+];
+
+function routeHandler(req: NextRequest, { params }: RouteRequestParams, opt: AuthOptions) {
+    console.log(params);
     if (params && params.auth) {
         const route = params.auth[0];
-
-        switch (route) {
-            case 'login':
-                return loginRoute(req, opt);
-            case 'refresh-token':
-                return refreshTokenRoute(req, opt);
-        }
-
-        return NextResponse.json({ hello: 'hello' });
+        const method = req.method;
+        const authRoute = router.find(r => r.route === route && r.method === method);
+        return authRoute ? authRoute.handler(req, opt) : new NextResponse(null, { status: 404 });
     }
 }
 
 export default function Auth(opt: AuthOptions) {
-    return async (req: NextRequest, params: RouteRequestParams) => {
-        return await routeHandler(req, params, opt);
+    return (req: NextRequest, params: RouteRequestParams) => {
+        return routeHandler(req, params, opt);
     };
 }
