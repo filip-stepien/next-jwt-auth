@@ -22,6 +22,9 @@ const options: AuthOptions = {
         username: 'username',
         password: 'password'
     },
+    redirect: {
+        logoutRedirectRoute: '/'
+    },
     cookie: {
         tokenCookieName: 'refresh-token'
     },

@@ -45,3 +45,9 @@ export async function getBodyFormData(req: NextRequest): Promise<object | null> 
         return null;
     }
 }
+
+export function getTokenCookieValue(req: NextRequest, cookieName: string): string | null {
+    const tokenCookie = req.cookies.get(cookieName);
+    const token = tokenCookie?.value;
+    return token ?? null;
+}

@@ -26,6 +26,10 @@ export interface AuthOptions {
         tokenCookieName: string;
     };
 
+    redirect: {
+        logoutRedirectRoute: string;
+    };
+
     callbacks: {
         /** Callback emitted before access token generation.
          * Returned payload will be stored in the generated token.

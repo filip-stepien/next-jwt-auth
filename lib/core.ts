@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { AuthOptions, AuthRoute, RouteRequestParams } from './types';
 import loginRoute from '@/lib/routes/login';
 import refreshTokenRoute from '@/lib/routes/refreshToken';
+import logoutRoute from '@/lib/routes/logout';
 
 const router: AuthRoute[] = [
     { route: 'login', method: 'POST', handler: loginRoute },
-    { route: 'refreshToken', method: 'POST', handler: refreshTokenRoute }
+    { route: 'refreshToken', method: 'POST', handler: refreshTokenRoute },
+    { route: 'logout', method: 'POST', handler: logoutRoute }
 ];
 
 function routeHandler(req: NextRequest, { params }: RouteRequestParams, opt: AuthOptions) {
