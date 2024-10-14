@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AuthOptions } from '@/lib/types';
-import { refreshToken } from '@/lib//utils';
+import { getBodyJSON, refreshToken } from '@/lib//utils';
 
 export default async function refreshTokenRoute(req: NextRequest, opt: AuthOptions) {
     try {
-        const body = await req.json();
+        const body = (await getBodyJSON(req)) as { token: string };
+        if (!body) return new NextResponse(null, { status: 400 });
+
         const accessTokenStr = body?.token;
         const refreshTokenStr = req.cookies.get(opt.cookie.tokenCookieName)?.value;
 

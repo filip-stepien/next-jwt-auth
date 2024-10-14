@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AuthOptions } from '@/lib/types';
-import { generateToken } from '@/lib/utils';
+import { generateToken, getBodyFormData } from '@/lib/utils';
 
 export default async function loginRoute(req: NextRequest, opt: AuthOptions) {
     try {
-        const formData = await req.formData();
-        const username = formData.get(opt.inputNames.username) as string | null;
-        const password = formData.get(opt.inputNames.password) as string | null;
+        const formData = (await getBodyFormData(req)) as { username: string; password: string };
+        const { username, password } = formData;
 
-        if (!username || !password) return new NextResponse(null, { status: 400 });
+        if (!formData || !username || !password) return new NextResponse(null, { status: 400 });
 
         const authenticated = await opt.callbacks.login(username, password);
         if (!authenticated) return new NextResponse(null, { status: 401 });

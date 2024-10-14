@@ -9,7 +9,6 @@ const router: AuthRoute[] = [
 ];
 
 function routeHandler(req: NextRequest, { params }: RouteRequestParams, opt: AuthOptions) {
-    console.log(params);
     if (params && params.auth) {
         const route = params.auth[0];
         const method = req.method;
