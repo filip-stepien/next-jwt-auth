@@ -28,6 +28,7 @@ export interface AuthOptions {
 
     redirect: {
         logoutRedirectRoute: string;
+        loginPageRoute: string;
     };
 
     callbacks: {
@@ -50,7 +51,10 @@ export interface AuthOptions {
          * This function should be used to check if the refresh token
          * from the cookie is valid and matches the previously stored token.
          */
-        tokenValid: (refreshToken: string) => boolean | Promise<boolean>;
+        tokenValid: (
+            refreshTokenPayload: object,
+            refreshToken: string
+        ) => boolean | Promise<boolean>;
 
         /** Callback emitted before discarding the refresh token from the cookie.
          * This function should be used to delete the previously stored token.

@@ -28,6 +28,15 @@ export async function refreshToken(oldToken: string, opt: TokenOptions): Promise
     }
 }
 
+export async function verifyToken(token: string, secret: string): Promise<object | null> {
+    try {
+        const payload = await jose.jwtVerify(token, new TextEncoder().encode(secret));
+        return payload as object;
+    } catch (_e) {
+        return null;
+    }
+}
+
 export async function getBodyJSON(req: NextRequest): Promise<object | null> {
     try {
         return await req.json();

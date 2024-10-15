@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { AuthRouteHandler } from '@/lib/types';
-import { getBodyJSON, refreshToken } from '@/lib//utils';
+import { getBodyJSON, refreshToken, verifyToken } from '@/lib//utils';
 
 const refreshTokenRoute: AuthRouteHandler = async (req, opt) => {
     try {
@@ -12,7 +12,12 @@ const refreshTokenRoute: AuthRouteHandler = async (req, opt) => {
 
         if (!accessTokenStr || !refreshTokenStr) return new NextResponse(null, { status: 400 });
 
-        const tokenValid = await Promise.resolve(opt.callbacks.tokenValid(refreshTokenStr));
+        const verifiedPayload = await verifyToken(refreshTokenStr, opt.refreshToken.secret);
+        if (!verifiedPayload) return new NextResponse(null, { status: 401 });
+
+        const tokenValid = await Promise.resolve(
+            opt.callbacks.tokenValid(verifiedPayload, refreshTokenStr)
+        );
         if (!tokenValid) return new NextResponse(null, { status: 401 });
 
         const newTokenStr = await refreshToken(accessTokenStr, opt.accessToken);

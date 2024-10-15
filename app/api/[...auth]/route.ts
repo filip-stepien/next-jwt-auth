@@ -1,7 +1,12 @@
 import Auth from '@/lib/core';
 import { AuthOptions } from '@/lib/types';
+import * as jose from 'jose';
 
 // demo
+
+interface User extends jose.JWTPayload {
+    username: string;
+}
 
 let storage: string[] = [];
 
@@ -29,12 +34,12 @@ const options: AuthOptions = {
         tokenCookieName: 'refresh-token'
     },
     callbacks: {
-        accessTokenPayload: () => ({ username: 'admin' }),
+        accessTokenPayload: (): User => ({ username: 'admin' }),
         refreshTokenPayload: async () => ({ username: 'admin' }),
         login: (_username: string, _password: string) => {
             return true;
         },
-        tokenValid: (_refreshToken: string) => {
+        tokenValid: (_payload: object, _refreshToken: string) => {
             return true;
         },
         logout: (refreshToken: string) => {
