@@ -1,17 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getTokenCookieValue, verifyToken } from './utils';
-import { AuthOptions } from './types';
+import { getReqToken } from './utils';
+import { AuthOptions, AuthRouteHandler } from './types';
 
-async function handleOtherRoutes(req: NextRequest, opt: AuthOptions) {
-    const token = getTokenCookieValue(req, opt.cookie.tokenCookieName);
+const handleOtherRoutes: AuthRouteHandler = async (req: NextRequest, opt: AuthOptions) => {
+    const token = await getReqToken(req, opt);
 
     if (token) {
-        const payload = await verifyToken(token, opt.refreshToken.secret);
-        if (payload) {
-            const valid = await Promise.resolve(opt.callbacks.tokenValid(payload, token));
-            if (valid) NextResponse.next();
-        }
+        const { tokenStr, payload } = token;
+        const valid = await Promise.resolve(opt.callbacks.tokenValid(payload, tokenStr));
+        if (valid) return NextResponse.next();
     }
 
-    return NextResponse.redirect(new URL(opt.redirect.logoutRedirectRoute, req.url));
+    return NextResponse.redirect(new URL(opt.logoutRedirectRoute, req.url));
+};
+
+const handleLoginRoute: AuthRouteHandler = async (req: NextRequest, opt: AuthOptions) => {
+    const token = await getReqToken(req, opt);
+    if (token) return NextResponse.redirect(req.url);
+
+    return NextResponse.next();
+};
+
+export async function AuthMiddleware(opt: AuthOptions) {
+    return async function middleware(req: NextRequest) {
+        if (req.nextUrl.pathname.startsWith(opt.loginPageRoute)) {
+            return handleLoginRoute(req, opt);
+        } else {
+            return handleOtherRoutes(req, opt);
+        }
+    };
 }

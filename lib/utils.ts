@@ -2,6 +2,7 @@ import { JWTPayload, SignJWT } from 'jose';
 import { TokenOptions } from './types';
 import * as jose from 'jose';
 import { NextRequest } from 'next/server';
+import { AuthOptions } from './types';
 
 export async function generateToken(payload: object, opt: TokenOptions): Promise<string | null> {
     try {
@@ -28,13 +29,27 @@ export async function refreshToken(oldToken: string, opt: TokenOptions): Promise
     }
 }
 
-export async function verifyToken(token: string, secret: string): Promise<object | null> {
+export async function getTokenPayload(token: string, secret: string): Promise<object | null> {
     try {
         const payload = await jose.jwtVerify(token, new TextEncoder().encode(secret));
         return payload as object;
     } catch (_e) {
         return null;
     }
+}
+
+export async function getReqToken(
+    req: NextRequest,
+    opt: AuthOptions
+): Promise<{ tokenStr: string; payload: object } | null> {
+    const tokenStr = getTokenCookieValue(req, opt.cookie.tokenCookieName);
+
+    if (tokenStr) {
+        const payload = await getTokenPayload(tokenStr, opt.refreshToken.secret);
+        if (payload) return { tokenStr, payload };
+    }
+
+    return null;
 }
 
 export async function getBodyJSON(req: NextRequest): Promise<object | null> {

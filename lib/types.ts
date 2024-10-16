@@ -26,10 +26,8 @@ export interface AuthOptions {
         tokenCookieName: string;
     };
 
-    redirect: {
-        logoutRedirectRoute: string;
-        loginPageRoute: string;
-    };
+    logoutRedirectRoute: string;
+    loginPageRoute: string;
 
     callbacks: {
         /** Callback emitted before access token generation.

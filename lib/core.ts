@@ -21,6 +21,7 @@ function routeHandler(req: NextRequest, { params }: RouteRequestParams, opt: Aut
 
 export default function Auth(opt: AuthOptions) {
     return (req: NextRequest, params: RouteRequestParams) => {
+        console.log(new URL(req.url));
         return routeHandler(req, params, opt);
     };
 }
