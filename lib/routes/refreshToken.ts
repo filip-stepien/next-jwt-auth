@@ -1,26 +1,21 @@
 import { NextResponse } from 'next/server';
 import { AuthRouteHandler } from '@/lib/types';
-import { getBodyJSON, refreshToken, verifyToken } from '@/lib//utils';
+import { getReqAccessToken, getReqRefreshToken, getRefreshedToken } from '@/lib//utils';
 
 const refreshTokenRoute: AuthRouteHandler = async (req, opt) => {
     try {
-        const body = (await getBodyJSON(req)) as { token: string };
-        if (!body) return new NextResponse(null, { status: 400 });
+        const accessToken = await getReqAccessToken(req, opt);
+        const refreshToken = await getReqRefreshToken(req, opt);
 
-        const accessTokenStr = body?.token;
-        const refreshTokenStr = req.cookies.get(opt.cookie.tokenCookieName)?.value;
+        if (!accessToken || !refreshToken) return new NextResponse(null, { status: 400 });
 
-        if (!accessTokenStr || !refreshTokenStr) return new NextResponse(null, { status: 400 });
+        const { refreshTokenStr, refreshTokenPayload } = refreshToken;
+        const { accessTokenStr } = accessToken;
 
-        const verifiedPayload = await verifyToken(refreshTokenStr, opt.refreshToken.secret);
-        if (!verifiedPayload) return new NextResponse(null, { status: 401 });
+        const valid = await Promise.resolve(opt.tokenValid(refreshTokenPayload, refreshTokenStr));
+        if (!valid) return new NextResponse(null, { status: 401 });
 
-        const tokenValid = await Promise.resolve(
-            opt.callbacks.tokenValid(verifiedPayload, refreshTokenStr)
-        );
-        if (!tokenValid) return new NextResponse(null, { status: 401 });
-
-        const newTokenStr = await refreshToken(accessTokenStr, opt.accessToken);
+        const newTokenStr = await getRefreshedToken(accessTokenStr, opt.accessToken);
         if (!newTokenStr) return new NextResponse(null, { status: 401 });
 
         return NextResponse.json({ token: newTokenStr });

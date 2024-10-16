@@ -20,7 +20,10 @@ export async function generateToken(payload: object, opt: TokenOptions): Promise
     }
 }
 
-export async function refreshToken(oldToken: string, opt: TokenOptions): Promise<string | null> {
+export async function getRefreshedToken(
+    oldToken: string,
+    opt: TokenOptions
+): Promise<string | null> {
     try {
         const payload = jose.decodeJwt(oldToken);
         return await generateToken(payload, opt);
@@ -38,15 +41,15 @@ export async function getTokenPayload(token: string, secret: string): Promise<ob
     }
 }
 
-export async function getReqToken(
+export async function getReqRefreshToken(
     req: NextRequest,
     opt: AuthOptions
-): Promise<{ tokenStr: string; payload: object } | null> {
-    const tokenStr = getTokenCookieValue(req, opt.cookie.tokenCookieName);
+): Promise<{ refreshTokenStr: string; refreshTokenPayload: object } | null> {
+    const refreshTokenStr = getTokenCookieValue(req, opt.tokenCookieName);
 
-    if (tokenStr) {
-        const payload = await getTokenPayload(tokenStr, opt.refreshToken.secret);
-        if (payload) return { tokenStr, payload };
+    if (refreshTokenStr) {
+        const refreshTokenPayload = await getTokenPayload(refreshTokenStr, opt.refreshToken.secret);
+        if (refreshTokenPayload) return { refreshTokenStr, refreshTokenPayload };
     }
 
     return null;
@@ -60,11 +63,56 @@ export async function getBodyJSON(req: NextRequest): Promise<object | null> {
     }
 }
 
-export async function getBodyFormData(req: NextRequest): Promise<object | null> {
+export async function getReqAccessToken(
+    req: NextRequest,
+    opt: AuthOptions
+): Promise<{ accessTokenStr: string; accessTokenPayload: object } | null> {
+    try {
+        const body = (await getBodyJSON(req)) as { token: string };
+        const accessTokenStr = body?.token;
+
+        if (accessTokenStr) {
+            const accessTokenPayload = await getTokenPayload(
+                accessTokenStr,
+                opt.accessToken.secret
+            );
+            if (accessTokenPayload) return { accessTokenStr, accessTokenPayload };
+        }
+
+        return null;
+    } catch (_e) {
+        return null;
+    }
+}
+
+export async function getReqBodyFormData(
+    req: NextRequest
+): Promise<{ [key: string]: string } | null> {
     try {
         const formData = await req.formData();
         const formEntries = formData.entries();
-        return Object.fromEntries(formEntries);
+        return Object.fromEntries(formEntries) as { [key: string]: string };
+    } catch (_e) {
+        return null;
+    }
+}
+
+export async function getReqFormCredentials(
+    req: NextRequest,
+    opt: AuthOptions
+): Promise<{ [key: string]: string } | null> {
+    try {
+        const formData = await getReqBodyFormData(req);
+        const { usernameInputName, passwordInputName } = opt;
+
+        if (formData && usernameInputName in formData && passwordInputName in formData) {
+            return {
+                [usernameInputName]: formData[usernameInputName],
+                [passwordInputName]: formData[passwordInputName]
+            };
+        }
+
+        return null;
     } catch (_e) {
         return null;
     }

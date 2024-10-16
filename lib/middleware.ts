@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getReqToken } from './utils';
+import { getReqRefreshToken } from './utils';
 import { AuthOptions, AuthRouteHandler } from './types';
 
 const handleOtherRoutes: AuthRouteHandler = async (req: NextRequest, opt: AuthOptions) => {
-    const token = await getReqToken(req, opt);
+    const refreshToken = await getReqRefreshToken(req, opt);
 
-    if (token) {
-        const { tokenStr, payload } = token;
-        const valid = await Promise.resolve(opt.callbacks.tokenValid(payload, tokenStr));
+    if (refreshToken) {
+        const { refreshTokenStr, refreshTokenPayload } = refreshToken;
+        const valid = await Promise.resolve(opt.tokenValid(refreshTokenPayload, refreshTokenStr));
         if (valid) return NextResponse.next();
     }
 
@@ -15,7 +15,7 @@ const handleOtherRoutes: AuthRouteHandler = async (req: NextRequest, opt: AuthOp
 };
 
 const handleLoginRoute: AuthRouteHandler = async (req: NextRequest, opt: AuthOptions) => {
-    const token = await getReqToken(req, opt);
+    const token = await getReqRefreshToken(req, opt);
     if (token) return NextResponse.redirect(req.url);
 
     return NextResponse.next();
