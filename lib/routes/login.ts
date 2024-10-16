@@ -13,8 +13,8 @@ const loginRoute: AuthRouteHandler = async (req, opt) => {
 
         if (!authenticated) return new NextResponse(null, { status: 401 });
 
-        const accessTokenPayload = await opt.accessTokenPayload();
-        const refreshTokenPayload = await opt.refreshTokenPayload();
+        const accessTokenPayload = await opt.accessTokenPayload(username);
+        const refreshTokenPayload = await opt.refreshTokenPayload(username);
         const accessToken = await generateToken(accessTokenPayload, opt.accessToken);
         const refreshToken = await generateToken(refreshTokenPayload, opt.refreshToken);
 

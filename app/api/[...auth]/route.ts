@@ -1,12 +1,7 @@
 import Auth from '@/lib/core';
 import { AuthOptions } from '@/lib/types';
-import * as jose from 'jose';
 
 // demo
-
-interface User extends jose.JWTPayload {
-    username: string;
-}
 
 let storage: string[] = [];
 
@@ -23,28 +18,22 @@ const options: AuthOptions = {
         issuer: 'issuer',
         audience: 'audience'
     },
-    inputNames: {
-        username: 'username',
-        password: 'password'
+    usernameInputName: 'username',
+    passwordInputName: 'password',
+    logoutRedirectRoute: '/',
+    loginPageRoute: '/login',
+    tokenCookieName: 'refresh-token',
+
+    accessTokenPayload: username => ({ username }),
+    refreshTokenPayload: async username => ({ username }),
+    login: (_usernam, _password) => {
+        return true;
     },
-    redirect: {
-        logoutRedirectRoute: '/'
+    tokenValid: (_payload, _refreshToken) => {
+        return true;
     },
-    cookie: {
-        tokenCookieName: 'refresh-token'
-    },
-    callbacks: {
-        accessTokenPayload: (): User => ({ username: 'admin' }),
-        refreshTokenPayload: async () => ({ username: 'admin' }),
-        login: (_username: string, _password: string) => {
-            return true;
-        },
-        tokenValid: (_payload: object, _refreshToken: string) => {
-            return true;
-        },
-        logout: (refreshToken: string) => {
-            storage = storage.filter(token => token !== refreshToken);
-        }
+    logout: (_payload, refreshToken) => {
+        storage = storage.filter(token => token !== refreshToken);
     }
 };
 const handler = Auth(options);

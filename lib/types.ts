@@ -27,12 +27,12 @@ export interface AuthOptions {
     /** Callback emitted before access token generation.
      * Returned payload will be stored in the generated token.
      */
-    accessTokenPayload: () => object | Promise<object>;
+    accessTokenPayload: (username: string) => object | Promise<object>;
 
     /** Callback emitted before refresh token generation.
      * Returned payload will be stored in the generated token.
      */
-    refreshTokenPayload: () => object | Promise<object>;
+    refreshTokenPayload: (username: string) => object | Promise<object>;
 
     /** Callback used for authenticating a user.
      * This function should check if passed credentials are valid.
@@ -48,7 +48,7 @@ export interface AuthOptions {
     /** Callback emitted before discarding the refresh token from the cookie.
      * This function should be used to delete the previously stored token.
      */
-    logout: (refreshToken: string) => void | Promise<void>;
+    logout: (refreshTokenPayload: object, refreshToken: string) => void | Promise<void>;
 }
 
 export type AuthRouteHandler = (
