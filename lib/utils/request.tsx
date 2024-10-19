@@ -1,51 +1,18 @@
-import { JWTPayload, SignJWT } from 'jose';
-import { TokenOptions } from './types';
-import * as jose from 'jose';
 import { NextRequest } from 'next/server';
-import { AuthOptions } from './types';
+import { AuthOptions } from '@/lib/types';
+import { getTokenPayload } from '@/lib/utils/jwt';
 
-export async function generateToken(payload: object, opt: TokenOptions): Promise<string | null> {
-    try {
-        const jwtPayload = payload as JWTPayload;
-        const token = await new SignJWT(jwtPayload)
-            .setProtectedHeader({ alg: 'HS256' })
-            .setIssuedAt()
-            .setIssuer(opt.issuer)
-            .setAudience(opt.audience)
-            .setExpirationTime(opt.expiresIn)
-            .sign(new TextEncoder().encode(opt.secret));
-        return token;
-    } catch (_e) {
-        return null;
-    }
-}
-
-export async function getRefreshedToken(
-    oldToken: string,
-    opt: TokenOptions
-): Promise<string | null> {
-    try {
-        const payload = jose.decodeJwt(oldToken);
-        return await generateToken(payload, opt);
-    } catch (_e) {
-        return null;
-    }
-}
-
-export async function getTokenPayload(token: string, secret: string): Promise<object | null> {
-    try {
-        const payload = await jose.jwtVerify(token, new TextEncoder().encode(secret));
-        return payload as object;
-    } catch (_e) {
-        return null;
-    }
+export function getReqCookieValue(req: NextRequest, cookieName: string): string | null {
+    const cookie = req.cookies.get(cookieName);
+    const value = cookie?.value;
+    return value ?? null;
 }
 
 export async function getReqRefreshToken(
     req: NextRequest,
     opt: AuthOptions
 ): Promise<{ refreshTokenStr: string; refreshTokenPayload: object } | null> {
-    const refreshTokenStr = getTokenCookieValue(req, opt.tokenCookieName);
+    const refreshTokenStr = getReqCookieValue(req, opt.tokenCookieName);
 
     if (refreshTokenStr) {
         const refreshTokenPayload = await getTokenPayload(refreshTokenStr, opt.refreshToken.secret);
@@ -55,7 +22,7 @@ export async function getReqRefreshToken(
     return null;
 }
 
-export async function getBodyJSON(req: NextRequest): Promise<object | null> {
+export async function getReqBodyJSON(req: NextRequest): Promise<object | null> {
     try {
         return await req.json();
     } catch (_e) {
@@ -68,7 +35,7 @@ export async function getReqAccessToken(
     opt: AuthOptions
 ): Promise<{ accessTokenStr: string; accessTokenPayload: object } | null> {
     try {
-        const body = (await getBodyJSON(req)) as { token: string };
+        const body = (await getReqBodyJSON(req)) as { token: string };
         const accessTokenStr = body?.token;
 
         if (accessTokenStr) {
@@ -116,10 +83,4 @@ export async function getReqFormCredentials(
     } catch (_e) {
         return null;
     }
-}
-
-export function getTokenCookieValue(req: NextRequest, cookieName: string): string | null {
-    const tokenCookie = req.cookies.get(cookieName);
-    const token = tokenCookie?.value;
-    return token ?? null;
 }

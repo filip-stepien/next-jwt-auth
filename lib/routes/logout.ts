@@ -1,5 +1,5 @@
 import { AuthRouteHandler } from '@/lib/types';
-import { getReqRefreshToken } from '../utils';
+import { getReqRefreshToken } from '@/lib/utils/request';
 import { NextResponse } from 'next/server';
 
 const logoutRoute: AuthRouteHandler = async (req, opt) => {

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { AuthRouteHandler } from '@/lib/types';
-import { getReqAccessToken, getReqRefreshToken, getRefreshedToken } from '@/lib//utils';
+import { getReqAccessToken, getReqRefreshToken } from '@/lib/utils/request';
+import { getRefreshedToken } from '@/lib/utils/jwt';
 
 const refreshTokenRoute: AuthRouteHandler = async (req, opt) => {
     try {

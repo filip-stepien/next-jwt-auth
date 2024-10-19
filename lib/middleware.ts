@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getReqRefreshToken } from './utils';
+import { getReqRefreshToken } from '@/lib/utils/request';
 import { AuthOptions, AuthRouteHandler } from './types';
 
 const handleOtherRoutes: AuthRouteHandler = async (req: NextRequest, opt: AuthOptions) => {

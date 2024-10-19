@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { AuthRouteHandler } from '@/lib/types';
-import { generateToken, getReqFormCredentials } from '@/lib/utils';
+import { generateToken } from '@/lib/utils/jwt';
+import { getReqFormCredentials } from '@/lib/utils/request';
 
 const loginRoute: AuthRouteHandler = async (req, opt) => {
     try {
