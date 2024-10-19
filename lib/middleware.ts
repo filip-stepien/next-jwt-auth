@@ -16,12 +16,12 @@ const handleOtherRoutes: AuthRouteHandler = async (req: NextRequest, opt: AuthOp
 
 const handleLoginRoute: AuthRouteHandler = async (req: NextRequest, opt: AuthOptions) => {
     const token = await getReqRefreshToken(req, opt);
-    if (token) return NextResponse.redirect(req.url);
+    if (token) return NextResponse.redirect(new URL(opt.alreadyLoggedRoute, req.url));
 
     return NextResponse.next();
 };
 
-export async function AuthMiddleware(opt: AuthOptions) {
+export function AuthMiddleware(opt: AuthOptions) {
     return async function middleware(req: NextRequest) {
         if (req.nextUrl.pathname.startsWith(opt.loginPageRoute)) {
             return handleLoginRoute(req, opt);
