@@ -1,11 +1,10 @@
 import { AuthOptions } from '@/lib/types';
+import fs from 'fs';
 
 interface User {
     username: string;
     password: string;
 }
-
-const users: User[] = [];
 
 export const options: AuthOptions = {
     accessToken: {
@@ -31,13 +30,23 @@ export const options: AuthOptions = {
     accessTokenPayload: username => ({ username }),
     refreshTokenPayload: async username => ({ username }),
     register: (username, password) => {
-        users.push({ username, password });
-        console.log(users);
+        if (!fs.existsSync('debug.json')) fs.writeFileSync('debug.json', JSON.stringify([]));
+
+        const file = fs.readFileSync('debug.json', { encoding: 'utf8' });
+        const arr = JSON.parse(file) as User[];
+
+        arr.push({ username, password });
+        fs.writeFileSync('debug.json', JSON.stringify(arr));
+
         return true;
     },
     login: (username, password) => {
-        console.log(users);
-        return users.some(u => u.username === username && u.password === password);
+        if (!fs.existsSync('debug.json')) fs.writeFileSync('debug.json', JSON.stringify([]));
+
+        const file = fs.readFileSync('debug.json', { encoding: 'utf8' });
+        const arr = JSON.parse(file) as User[];
+
+        return arr.some(u => u.username === username && u.password === password);
     },
     tokenValid: (_payload, _refreshToken) => {
         return true;

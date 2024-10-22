@@ -1,22 +1,9 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { FormEvent } from 'react';
+import useLoginForm from '@/lib/hooks/useLoginForm';
 
 export default function Login() {
-    const router = useRouter();
-
-    const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-
-        const formData = new FormData(event.currentTarget);
-        const response = await fetch('/api/login', {
-            method: 'POST',
-            body: formData
-        });
-
-        if (response.ok) router.push('http://localhost:3000/test');
-    };
+    const { onSubmit, onChange, clearInputRef, errorMsg } = useLoginForm('/api/login', '/test');
 
     return (
         <div>
@@ -24,9 +11,10 @@ export default function Login() {
                 onSubmit={onSubmit}
                 style={{ display: 'flex', flexDirection: 'column', width: '200px', gap: '10px' }}
             >
-                <input type='text' name='username' placeholder='Login...' />
-                <input type='text' name='password' placeholder='Hasło...' />
+                <input onChange={onChange} type='text' name='username' placeholder='Login...' />
+                <input ref={clearInputRef} type='text' name='password' placeholder='Hasło...' />
                 <input type='submit' value='Log in' />
+                <p>{errorMsg}</p>
             </form>
         </div>
     );
