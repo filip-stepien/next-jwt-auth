@@ -6,5 +6,5 @@ const authMiddleware = AuthMiddleware(options);
 export { authMiddleware as middleware };
 
 export const config = {
-    matcher: ['/login', '/test', '/logout']
+    matcher: ['/login', '/register', '/test', '/logout']
 };

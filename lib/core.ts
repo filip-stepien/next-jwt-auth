@@ -3,11 +3,13 @@ import { AuthOptions, AuthRoute, RouteRequestParams } from './types';
 import loginRoute from '@/lib/routes/login';
 import refreshTokenRoute from '@/lib/routes/refreshToken';
 import logoutRoute from '@/lib/routes/logout';
+import registerRoute from './routes/register';
 
 const router: AuthRoute[] = [
     { route: 'login', method: 'POST', handler: loginRoute },
     { route: 'refreshToken', method: 'POST', handler: refreshTokenRoute },
-    { route: 'logout', method: 'POST', handler: logoutRoute }
+    { route: 'logout', method: 'POST', handler: logoutRoute },
+    { route: 'register', method: 'POST', handler: registerRoute }
 ];
 
 function routeHandler(req: NextRequest, { params }: RouteRequestParams, opt: AuthOptions) {

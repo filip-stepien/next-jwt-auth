@@ -11,6 +11,11 @@ export interface TokenOptions {
     audience: string;
 }
 
+export type AuthHandlerCallback = (
+    username: string,
+    password: string
+) => boolean | Promise<boolean>;
+
 export interface AuthOptions {
     accessToken: TokenOptions;
     refreshToken: TokenOptions;
@@ -23,6 +28,7 @@ export interface AuthOptions {
     tokenCookieName: string;
     logoutRedirectRoute: string;
     loginPageRoute: string;
+    registerPageRoute: string;
     alreadyLoggedRoute: string;
 
     /** Callback emitted before access token generation.
@@ -38,7 +44,9 @@ export interface AuthOptions {
     /** Callback used for authenticating a user.
      * This function should check if passed credentials are valid.
      */
-    login: (username: string, password: string) => boolean | Promise<boolean>;
+    login: AuthHandlerCallback;
+
+    register: AuthHandlerCallback;
 
     /** Callback emitted when the user navigates between pages or refreshes the access token.
      * This function should be used to check if the refresh token

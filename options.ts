@@ -1,5 +1,12 @@
 import { AuthOptions } from '@/lib/types';
 
+interface User {
+    username: string;
+    password: string;
+}
+
+const users: User[] = [];
+
 export const options: AuthOptions = {
     accessToken: {
         secret: '👻👻👻',
@@ -17,13 +24,20 @@ export const options: AuthOptions = {
     passwordInputName: 'password',
     logoutRedirectRoute: '/login',
     loginPageRoute: '/login',
+    registerPageRoute: '/register',
     alreadyLoggedRoute: '/test',
     tokenCookieName: 'refresh-token',
 
     accessTokenPayload: username => ({ username }),
     refreshTokenPayload: async username => ({ username }),
-    login: (_usernam, _password) => {
+    register: (username, password) => {
+        users.push({ username, password });
+        console.log(users);
         return true;
+    },
+    login: (username, password) => {
+        console.log(users);
+        return users.some(u => u.username === username && u.password === password);
     },
     tokenValid: (_payload, _refreshToken) => {
         return true;
